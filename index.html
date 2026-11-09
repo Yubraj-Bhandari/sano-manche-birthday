@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#140d18">
+<title>Sano Manche · The Birthday Vault</title>
+<meta name="description" content="A tiny vault, a lot of questions, and one birthday wish.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%80%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Inter:wght@300;400;500;600;700&family=Caveat:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css?v=4">
+<script>document.documentElement.classList.add("js");</script>
+</head>
+<body>
+
+<div class="bg-glow" aria-hidden="true">
+  <span class="blob blob-a"></span>
+  <span class="blob blob-b"></span>
+  <span class="blob blob-c"></span>
+</div>
+<div class="grain" aria-hidden="true"></div>
+<canvas id="confetti" aria-hidden="true"></canvas>
+
+<div class="level-wipe" id="levelWipe" aria-hidden="true">
+  <div class="wipe-content">
+    <span class="wipe-num" id="wipeNum">LEVEL 01</span>
+    <span class="wipe-name" id="wipeName">Identity Check</span>
+  </div>
+</div>
+
+<div class="scroll-rail" aria-hidden="true"><span id="scrollFill"></span></div>
+
+<header class="hud" id="hud" hidden>
+  <div class="hud-brand">sano<span>manche</span>.vault</div>
+  <ol class="pips" id="pips" aria-label="Progress">
+    <li data-step="1"></li>
+    <li data-step="2"></li>
+    <li data-step="3"></li>
+    <li data-step="4"></li>
+    <li data-step="5"></li>
+  </ol>
+  <button class="icon-btn" id="soundBtn" type="button" aria-label="Turn sound off" aria-pressed="true">
+    <svg class="ic-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M11 5 6 9H3v6h3l5 4V5Z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 6a9 9 0 0 1 0 12"/>
+    </svg>
+    <svg class="ic-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M11 5 6 9H3v6h3l5 4V5Z"/><path d="m16 9 5 6"/><path d="m21 9-5 6"/>
+    </svg>
+  </button>
+</header>
+
+<main id="app">
+
+  <!-- ============ 00 · BOOT ============ -->
+  <section class="screen screen-boot" id="screen-boot" data-screen="boot">
+    <div class="terminal" role="status" aria-live="polite">
+      <div class="terminal-bar">
+        <span></span><span></span><span></span>
+        <em>birthday_vault.exe</em>
+      </div>
+      <div class="terminal-body" id="bootLog"></div>
+      <div class="terminal-foot" id="bootFoot" hidden>
+        <span class="blink">IDENTITY REQUIRED</span>
+      </div>
+    </div>
+    <p class="skip-hint">tap anywhere to hurry up</p>
+  </section>
+
+  <!-- ============ 01 · LOCK ============ -->
+  <section class="screen" id="screen-lock" data-screen="lock">
+    <div class="card lock-card" id="lockCard">
+      <p class="eyebrow">Birthday vault <span>·</span> Level 00</p>
+      <h1 class="display">This vault opens<br>for <em>one</em> person.</h1>
+      <p class="lede">Not your mom. Not your crush. Definitely not whoever is reading over your shoulder right now.</p>
+
+      <form class="lock-form" id="lockForm" autocomplete="off">
+        <label for="lockInput">Type the name I call you</label>
+        <div class="input-row">
+          <input id="lockInput" type="text" placeholder="…" autocomplete="off" spellcheck="false" enterkeyhint="go">
+          <button class="btn btn-primary" type="submit">Unlock</button>
+        </div>
+      </form>
+
+      <p class="hint" id="lockHint" hidden>Hint: two words. The first one is “Sano”.</p>
+      <p class="microcopy">Wrong enough times and the vault starts charging rent.</p>
+    </div>
+  </section>
+
+  <!-- ============ 02 · QUIZ ============ -->
+  <section class="screen" id="screen-quiz" data-screen="quiz">
+    <div class="stage">
+      <div class="stage-head">
+        <p class="eyebrow">Level 01 <span>·</span> Identity verification</p>
+        <div class="step-count"><span id="quizIndex">01</span><i>/</i>03</div>
+      </div>
+
+      <div class="card quiz-card">
+        <h2 id="quizQuestion">Loading question…</h2>
+        <p class="quiz-sub" id="quizSub"></p>
+        <div class="options" id="quizOptions"></div>
+        <p class="quiz-foot" id="quizFoot" aria-live="polite"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 03 · GIFT ============ -->
+  <section class="screen" id="screen-gift" data-screen="gift">
+    <div class="stage narrow">
+      <p class="eyebrow">Level 02 <span>·</span> Consent form</p>
+      <h1 class="display">Do you accept<br>your birthday gift?</h1>
+      <p class="lede">Fair warning: it is not expensive. It is, however, aggressively thoughtful.</p>
+
+      <div class="gift-actions">
+        <button class="btn btn-primary btn-xl" id="acceptBtn" type="button">Yes, obviously</button>
+        <button class="btn btn-ghost btn-xl" id="declineBtn" type="button">No thanks</button>
+      </div>
+
+      <p class="microcopy" id="giftNote">There is a correct answer.</p>
+    </div>
+  </section>
+
+  <!-- ============ 04 · HEARTS ============ -->
+  <section class="screen" id="screen-hearts" data-screen="hearts">
+    <div class="stage wide">
+      <div class="stage-head">
+        <div>
+          <p class="eyebrow">Level 03 <span>·</span> Physical education</p>
+          <h2 class="h2">Catch 19 hearts.</h2>
+        </div>
+        <div class="counter" aria-live="polite"><span id="heartCount">0</span><i>/</i>19</div>
+      </div>
+
+      <div class="heartfield" id="heartfield">
+        <div class="basket" id="basket" aria-hidden="true">
+          <span class="basket-lid"></span>
+          <span class="basket-ribbon"></span>
+        </div>
+        <div class="game-overlay" id="gameOverlay">
+          <p class="overlay-title">One heart for every year of you.</p>
+          <p class="overlay-sub">Drag to move the box. Grab all 19. No pressure. (All the pressure.)</p>
+          <button class="btn btn-primary" id="startGameBtn" type="button">Let me catch</button>
+        </div>
+      </div>
+
+      <div class="heart-progress"><div class="heart-progress-fill" id="heartBar"></div></div>
+      <p class="microcopy center" id="heartNote">Catch one for every year. Miss one and I’ll be mildly devastated.</p>
+    </div>
+  </section>
+
+  <!-- ============ 05 · UNBOX ============ -->
+  <section class="screen" id="screen-unbox" data-screen="unbox">
+    <div class="stage narrow unbox-stage">
+      <p class="eyebrow">Level 04 <span>·</span> Delivery</p>
+      <h1 class="display">Your gift is<br><em>wrapped.</em></h1>
+      <p class="lede">It only opens for the birthday girl. Tap it three times. Nothing bad will happen. Something good will.</p>
+
+      <button class="giftbox" id="giftbox" type="button" aria-label="Tap the gift box to open it">
+        <span class="giftbox-glow"></span>
+        <span class="giftbox-lid"><span class="giftbow"></span></span>
+        <span class="giftbox-body">
+          <span class="giftribbon"></span>
+          <span class="gifttag">for Sano Manche</span>
+        </span>
+      </button>
+
+      <p class="unbox-note" id="unboxNote">Tap count: 0 / 3</p>
+      <p class="microcopy">It is not fragile. Probably.</p>
+    </div>
+  </section>
+
+  <!-- ============ 06 · REVEAL ============ -->
+  <section class="screen screen-reveal" id="screen-reveal" data-screen="reveal">
+    <div class="reveal-inner">
+
+      <header class="reveal-hero">
+        <div class="float-hearts" id="floatHearts" aria-hidden="true"></div>
+        <p class="eyebrow">Level 19 <span>·</span> Unlocked</p>
+        <h1 class="mega">Happy <em>19th</em>,<br>Sano Manche</h1>
+        <p class="nepali">जन्मदिनको धेरै धेरै शुभकामना, सानो मान्छे।</p>
+
+        <div class="polaroids" aria-hidden="true">
+          <figure class="polaroid p1">
+            <img src="assets/photos/01-mirror.jpg" alt="">
+            <figcaption>trouble, certified</figcaption>
+          </figure>
+          <figure class="polaroid p2">
+            <img src="assets/photos/07-yellow.jpg" alt="">
+            <figcaption>main character</figcaption>
+          </figure>
+          <figure class="polaroid p3">
+            <img src="assets/photos/04-sunset.jpg" alt="">
+            <figcaption>golden hour, obviously</figcaption>
+          </figure>
+        </div>
+
+        <p class="scroll-cue" aria-hidden="true">scroll for your gift<span>↓</span></p>
+      </header>
+
+      <!-- WISH -->
+      <section class="wish-section card fade-on-scroll">
+        <p class="eyebrow">Before the letter</p>
+        <h2 class="h2">Make a wish. Make it selfish.</h2>
+        <p class="lede small">Nineteen candles. Tap them out one by one — or cheat and use the button.</p>
+
+        <div class="cake" id="cake">
+          <div class="candles" id="candles"></div>
+          <div class="cake-tier cake-tier-top"></div>
+          <div class="cake-tier cake-tier-bottom"></div>
+          <div class="cake-plate"></div>
+        </div>
+
+        <button class="btn btn-primary" id="blowBtn" type="button">Blow out all 19</button>
+        <p class="microcopy" id="wishNote">Safety first: they are not real candles. Probably.</p>
+      </section>
+
+      <!-- LETTER -->
+      <article class="card letter fade-on-scroll">
+        <p class="letter-to">Dear Sano Manche,</p>
+        <p>Happy 19th. That is officially too old to be this small, and yet here we are — and honestly, I would like to keep it that way.</p>
+        <p>You are one of those people who makes a room feel less like a room. You laugh at your own jokes before you finish them. You show up. You are a little bit of chaos and a lot of warmth.</p>
+        <p>I know 19 feels like a strange age — too young for some things, too old for others. For what it is worth: you are doing better than you think. And on the days you are not, you have people. Including me. Especially me, annoyingly.</p>
+        <p>Some facts: the world is better when you are in it. Your laugh should be studied by scientists. And no, I am never going to stop calling you Sano Manche.</p>
+        <p>So — happy birthday, tiny human. Stay loud, stay ridiculous, stay exactly this impossible to ignore.</p>
+        <p class="letter-sign">With an unreasonable amount of affection,<br><span>your friend who clearly had too much free time</span></p>
+        <p class="letter-ps">P.S. If this were a rom-com, this is the part where I would say something smooth. I am not going to. But you noticed, didn’t you.</p>
+      </article>
+
+      <!-- 19 REASONS -->
+      <section class="reasons-section fade-on-scroll">
+        <div class="section-head">
+          <p class="eyebrow">Deck of 19</p>
+          <h2 class="h2">19 reasons you are impossible to ignore</h2>
+          <p class="lede small">Tap the card. Read it. Draw another. Collect all nineteen.</p>
+        </div>
+
+        <div class="deck-wrap">
+          <button class="reason-card" id="reasonCard" type="button" aria-label="Flip this card">
+            <span class="reason-inner">
+              <span class="reason-face reason-front">
+                <span class="reason-kicker">reason</span>
+                <span class="reason-num" id="reasonNum">01</span>
+                <span class="reason-tap">tap to flip</span>
+              </span>
+              <span class="reason-face reason-back">
+                <span class="reason-text" id="reasonText"></span>
+              </span>
+            </span>
+          </button>
+        </div>
+
+        <div class="deck-foot">
+          <span class="deck-count" id="reasonCount">0 / 19 seen</span>
+          <button class="btn btn-ghost btn-sm" id="nextReason" type="button" disabled>Draw another</button>
+        </div>
+      </section>
+
+      <!-- GALLERY -->
+      <section class="gallery-section fade-on-scroll">
+        <div class="section-head">
+          <p class="eyebrow">Exhibits A – L</p>
+          <h2 class="h2">The Sano Manche Archive</h2>
+          <p class="lede small">Every photo you sent me, with the commentary it deserved.</p>
+        </div>
+        <div class="gallery" id="gallery"></div>
+      </section>
+
+      <!-- VIDEO -->
+      <section class="video-section" id="videoWrap" hidden>
+        <div class="section-head">
+          <p class="eyebrow">Now playing</p>
+          <h2 class="h2">Moving pictures of you</h2>
+        </div>
+        <div class="video-frame">
+          <video id="bdayVideo" controls playsinline preload="metadata" poster="assets/photos/03-courtyard.jpg" src="assets/video/birthday.mp4"></video>
+        </div>
+      </section>
+
+      <!-- BONUS -->
+      <section class="secret-section fade-on-scroll">
+        <div class="card secret-card">
+          <p class="eyebrow">One last thing</p>
+          <h2 class="h2">There is a bonus message.</h2>
+          <p class="lede small">It was hidden behind all those games. Unlock it, if you want.</p>
+          <button class="btn btn-primary" id="secretBtn" type="button">Open the bonus message</button>
+          <p class="secret-text" id="secretText" aria-live="polite"></p>
+        </div>
+      </section>
+
+      <footer class="reveal-foot">
+        <p>Built for <strong>Sano Manche</strong> · <span id="year">2026</span></p>
+        <div class="foot-actions">
+          <button class="btn btn-ghost btn-sm" id="replayBtn" type="button">Play it again</button>
+          <button class="do-not-press" id="doNotPress" type="button">do not press</button>
+        </div>
+      </footer>
+
+    </div>
+  </section>
+
+</main>
+
+<button class="easter-heart" id="easterHeart" type="button" aria-label="A small hidden heart" hidden>
+  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+</button>
+
+<div class="modal" id="modal" hidden>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <button class="modal-close" id="modalClose" type="button" aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="m6 6 12 12M18 6 6 18"/></svg>
+    </button>
+    <p class="eyebrow" id="modalEyebrow">Secret</p>
+    <h3 class="modal-title" id="modalTitle"></h3>
+    <p class="modal-text" id="modalText"></p>
+    <button class="btn btn-primary" id="modalOk" type="button">Okay, fine</button>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<div class="lightbox" id="lightbox" hidden>
+  <button class="lightbox-close" id="lightboxClose" type="button" aria-label="Close photo">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="m6 6 12 12M18 6 6 18"/></svg>
+  </button>
+  <figure>
+    <img id="lightboxImg" alt="">
+    <figcaption id="lightboxCap"></figcaption>
+  </figure>
+</div>
+
+<script src="app.js?v=4"></script>
+</body>
+</html>
