@@ -13,7 +13,6 @@
   const state = {
     muted: false,
     attempts: 0,
-    quizIndex: 0,
     noCount: 0,
     bootDone: false
   };
@@ -84,14 +83,13 @@
 
   const LEVELS = {
     lock: { num: "00", name: "The Lock" },
-    quiz: { num: "01", name: "Identity Check" },
     gift: { num: "02", name: "Consent Form" },
     hearts: { num: "03", name: "Catch 19" },
     unbox: { num: "04", name: "The Gift" },
     reveal: { num: "19", name: "Unlocked" }
   };
 
-  const screenStep = { lock: 1, quiz: 1, gift: 2, hearts: 3, unbox: 4, reveal: 5 };
+  const screenStep = { lock: 1, gift: 2, hearts: 3, unbox: 4, reveal: 5 };
 
   let navShowTimer = null;
   let navEndTimer = null;
@@ -136,7 +134,6 @@
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
 
-    if (name === "quiz") renderQuiz();
     if (name === "lock" && window.matchMedia("(pointer: fine)").matches) {
       setTimeout(() => $("#lockInput").focus(), 350);
     }
@@ -286,112 +283,12 @@
       chord();
       buzz([12, 40, 12]);
       lockCard.classList.add("unlocked");
-      setTimeout(() => go("quiz"), 950);
+      setTimeout(() => go("gift"), 950);
     }, 900);
   }
 
   /* -------------------------------------------------------
-     Level 01 · identity verification quiz
-     ------------------------------------------------------- */
-
-  const quiz = [
-    {
-      q: "How should I address you for the next 24 hours?",
-      sub: "Choose carefully. This is legally binding.",
-      options: [
-        { t: "Sano Manche", ok: true, reply: "Correct. And honestly — forever." },
-        { t: "Sano Manche, but formal", ok: false, reply: "Formal? On your birthday? The vault refuses." },
-        { t: "Big Manche", ok: false, reply: "“Sano” is the whole brand. Do not fight it." },
-        { t: "Your Majesty", ok: false, reply: "Tempting. But “Sano Manche” is funnier." }
-      ]
-    },
-    {
-      q: "You are 19. Which adult skill have you actually mastered?",
-      sub: "Be honest. The vault can smell lies.",
-      options: [
-        { t: "Doing my taxes", ok: false, reply: "Confident. Wrong, but confident. Respect." },
-        { t: "Looking busy when I am not", ok: true, reply: "Correct. Elite level. Genuinely impressive." },
-        { t: "Cooking exactly one dish", ok: false, reply: "That is not a skill, that is a personality." },
-        { t: "Waking up before noon", ok: false, reply: "The vault has seen your camera roll. It knows." }
-      ]
-    },
-    {
-      q: "Final check. Which one is you?",
-      sub: "Pick your photo. There is only one right answer.",
-      type: "photo",
-      options: [
-        { img: "assets/photos/01-mirror.jpg" },
-        { img: "assets/photos/07-yellow.jpg" },
-        { img: "assets/photos/08-blue.jpg" },
-        { img: "assets/photos/12-street.jpg" }
-      ]
-    }
-  ];
-
-  const quizBox = $("#quizOptions");
-  const quizFoot = $("#quizFoot");
-
-  function renderQuiz() {
-    const item = quiz[state.quizIndex];
-
-    $("#quizIndex").textContent = String(state.quizIndex + 1).padStart(2, "0");
-    $("#quizQuestion").textContent = item.q;
-    $("#quizSub").textContent = item.sub || "";
-    quizFoot.textContent = "";
-
-    quizBox.innerHTML = "";
-    quizBox.classList.toggle("photo-grid", item.type === "photo");
-
-    item.options.forEach((option, index) => {
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "option" + (option.img ? " option-photo" : "");
-      btn.innerHTML = option.img
-        ? `<img src="${option.img}" alt="A photo of Sano Manche">`
-        : `<span class="option-key">${"ABCD"[index]}</span><span>${option.t}</span>`;
-
-      btn.addEventListener("click", () => answerQuiz(btn, option, item), { once: true });
-      quizBox.appendChild(btn);
-    });
-  }
-
-  function answerQuiz(button, option, item) {
-    const isPhotoRound = item.type === "photo";
-    const correct = isPhotoRound || option.ok;
-
-    if (correct) {
-      button.classList.add("correct");
-      $$("#quizOptions .option").forEach((btn) => { btn.disabled = true; });
-
-      quizFoot.textContent = isPhotoRound
-        ? "Correct. All of them. The camera never really had a choice."
-        : option.reply;
-
-      chord();
-      buzz(14);
-      setTimeout(nextQuiz, 1500);
-      return;
-    }
-
-    button.classList.add("wrong");
-    button.disabled = true;
-    quizFoot.textContent = "Wrong. Try again — the vault is enjoying this.";
-    beep(160, 0.14, "square", 0.04);
-    buzz(24);
-    toast(option.reply);
-  }
-
-  function nextQuiz() {
-    state.quizIndex += 1;
-    if (state.quizIndex < quiz.length) {
-      renderQuiz();
-    } else {
-      go("gift");
-    }
-  }
-
-  /* -------------------------------------------------------
-     Level 02 · consent form with a cowardly "No"
+     Level 01 · consent form with a cowardly "No"
      ------------------------------------------------------- */
 
   const acceptBtn = $("#acceptBtn");
@@ -434,7 +331,7 @@
   });
 
   /* -------------------------------------------------------
-     Level 03 · catch 19 hearts
+     Level 02 · catch 19 hearts
      ------------------------------------------------------- */
 
   const field = $("#heartfield");
@@ -647,7 +544,7 @@
   $("#startGameBtn").addEventListener("click", startGame);
 
   /* -------------------------------------------------------
-     Level 04 · unboxing
+     Level 03 · unboxing
      ------------------------------------------------------- */
 
   const giftbox = $("#giftbox");

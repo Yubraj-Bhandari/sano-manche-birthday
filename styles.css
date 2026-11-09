@@ -466,106 +466,6 @@ body.on-reveal .pips { display: none; }
 }
 .hint[hidden] { display: none; }
 
-/* ---------- quiz ---------- */
-
-.quiz-card h2 {
-  margin: 0 0 0.5rem;
-  font-family: var(--font-display);
-  font-size: clamp(1.45rem, 4.6vw, 2.1rem);
-  font-weight: 500;
-  line-height: 1.18;
-  letter-spacing: -0.02em;
-}
-.quiz-sub {
-  margin: 0 0 1.6rem;
-  font-size: 0.88rem;
-  color: var(--cream-dim);
-}
-
-.options { display: grid; gap: 0.65rem; }
-
-.option {
-  display: flex;
-  align-items: center;
-  gap: 0.9rem;
-  width: 100%;
-  padding: 1rem 1.15rem;
-  text-align: left;
-  font-size: 0.94rem;
-  line-height: 1.4;
-  color: var(--cream);
-  background: rgba(255, 244, 233, 0.045);
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  cursor: pointer;
-  transition: transform 0.16s, background 0.2s, border-color 0.2s;
-  -webkit-tap-highlight-color: transparent;
-}
-.option:hover:not(:disabled) {
-  background: rgba(255, 244, 233, 0.09);
-  border-color: var(--line-strong);
-  transform: translateX(3px);
-}
-.option:disabled { cursor: default; }
-
-.option-key {
-  display: grid;
-  place-items: center;
-  flex: none;
-  width: 26px;
-  height: 26px;
-  border: 1px solid var(--line-strong);
-  border-radius: 50%;
-  font-size: 0.66rem;
-  font-weight: 700;
-  color: var(--cream-dim);
-}
-
-.option.correct {
-  background: rgba(159, 232, 210, 0.12);
-  border-color: rgba(159, 232, 210, 0.55);
-  animation: pop 0.4s ease;
-}
-.option.correct .option-key { border-color: var(--mint); color: var(--mint); }
-.option.wrong {
-  background: rgba(255, 95, 135, 0.1);
-  border-color: rgba(255, 95, 135, 0.5);
-  animation: shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97);
-  opacity: 0.7;
-}
-.option.wrong .option-key { border-color: var(--rose); color: var(--rose); }
-
-@keyframes pop { 50% { transform: scale(1.02); } }
-
-.option-photo {
-  padding: 0;
-  overflow: hidden;
-  aspect-ratio: 1 / 1;
-  border-radius: 18px;
-}
-.option-photo img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.4s ease;
-}
-.option-photo:hover img { transform: scale(1.06); }
-.option-photo.correct { outline: 2px solid var(--mint); outline-offset: 2px; }
-
-.options.photo-grid {
-  grid-template-columns: repeat(4, 1fr);
-  gap: 0.55rem;
-}
-
-.quiz-foot {
-  min-height: 1.4rem;
-  margin: 1.2rem 0 0;
-  font-family: var(--font-display);
-  font-size: 0.95rem;
-  font-style: italic;
-  color: var(--blush);
-}
-
 /* ---------- gift ---------- */
 
 .gift-actions {
@@ -991,8 +891,6 @@ body.on-reveal .pips { display: none; }
 
   .stage-head { align-items: center; }
 
-  .options.photo-grid { grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
-  .option-photo { aspect-ratio: 4 / 5; }
 
   .gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .gallery figcaption { font-size: 0.9rem; padding: 0.55rem 0.6rem 0.7rem; }
